@@ -3,10 +3,7 @@ package com.chy.project.manager;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chy.project.common.BaseResponse;
 import com.chy.project.common.ErrorCode;
-import com.chy.project.datasource.DataSource;
-import com.chy.project.datasource.PictureDataSource;
-import com.chy.project.datasource.PostDataSource;
-import com.chy.project.datasource.UserDataSource;
+import com.chy.project.datasource.*;
 import com.chy.project.exception.BusinessException;
 import com.chy.project.exception.ThrowUtils;
 import com.chy.project.model.dto.post.PostQueryRequest;
@@ -49,6 +46,9 @@ public class SearchFacade {
 
     @Resource
     private PictureDataSource pictureDataSource;
+
+    @Resource
+    private DataSourceRegistry dataSourceRegistry;
 
     public SearchVO searchAll(@RequestBody SearchQueryRequest searchQueryRequest, HttpServletRequest request) {
 
@@ -108,34 +108,12 @@ public class SearchFacade {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "查询异常");
             }
         } else {
-            //注册，每种数据源都放到Map里
-            Map<String, DataSource<T>> typeDataSourcesMap = new HashMap() {{
-                put(SearchTypeEnum.POST.getValue(), postDataSource);
-                put(SearchTypeEnum.USER.getValue(), userDataSource);
-                put(SearchTypeEnum.PICTURE.getValue(), pictureDataSource);
-            }};
-
             SearchVO searchVO = new SearchVO();
-            DataSource<?> dataSource = typeDataSourcesMap.get(type);
+            //使用注测器
+            DataSource<?> dataSource = dataSourceRegistry.getDataSourceByType(type);
             Page<?> page = dataSource.doSearch(searchText, current, pageSize);
             searchVO.setDataList(page.getRecords());
             return searchVO;
-
-            /*
-            DataSource dataSource = null;
-            switch (searchTypeEnum) {
-                case POST:
-                    dataSource = postDateSource;
-                    break;
-                case USER:
-                    dataSource = userDataSource;
-                    break;
-                case PICTURE:
-                    dataSource = pictureDataSource;
-                    break;
-            }
-            Page page = dataSource.doSearch(searchText, current, pageSize);
-            */
         }
     }
 }
