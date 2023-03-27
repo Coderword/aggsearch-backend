@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @description:
+ * @description: 搜索类型枚举
  * @author: CHY
  * @date: 2023/3/27 13:07
  */
