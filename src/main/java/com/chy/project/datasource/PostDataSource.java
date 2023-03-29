@@ -2,6 +2,7 @@ package com.chy.project.datasource;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chy.project.model.dto.post.PostQueryRequest;
+import com.chy.project.model.entity.Post;
 import com.chy.project.model.vo.PostVO;
 import com.chy.project.service.PostService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +35,11 @@ public class PostDataSource implements DataSource<PostVO> {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         //从请求属性中拿到请求
         HttpServletRequest request = servletRequestAttributes.getRequest();
-        Page<PostVO> postVOPage = postService.listPostVOByPage(postQueryRequest, request);
-        return postVOPage;
+        // Page<PostVO> postVOPage = postService.listPostVOByPage(postQueryRequest, request);
+        // return postVOPage;
+        //从ES中查数据
+        Page<Post> postPage = postService.searchFromEs(postQueryRequest);
+        return postService.getPostVOPage(postPage, request);
     }
 
 }
